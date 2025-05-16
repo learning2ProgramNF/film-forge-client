@@ -1,15 +1,11 @@
 import { createRoot } from 'react-dom/client';
-
+import { MainView } from '../src/components/MainView/main-view'
 //Import statement to indicate that you need to bundle `./index.scss`
 import "./index.scss";
 
 //Main componet (will eventually use all the others)
-const FilmForgeApplication = () => {
-  return (
-    <div className="my-flix">
-      <div>Good Morning</div>
-    </div>
-  );
+const FilmForgeApplication = () => { 
+    return <MainView />;  
 };
 
 //Finds the root of your app
