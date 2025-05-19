@@ -14,3 +14,4 @@ const root = createRoot(container);
 
 //Tells React to render your app in the root of the DOM element
 root.render(<FilmForgeApplication />);
+// root.render(<h1 style={{ padding: '2rem' }}>🛠️ React Is Working!</h1>);
