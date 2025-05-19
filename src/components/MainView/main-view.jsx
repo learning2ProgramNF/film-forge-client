@@ -3,6 +3,8 @@ import { useState } from "react";
 import { MovieCard } from "../MovieCard/movie-card";
 import { MovieView } from "../MovieView/movie-view";
 
+const [selectedMovie, setSelectedMovie] = useState(null);
+
 export const MainView = () => {
   const [movies, setMovies] = useState([
     {
@@ -41,7 +43,7 @@ export const MainView = () => {
     return (
       <MovieView
         movie={selectedMovie}
-        onBackClick={() => setSelectedBook(null)}
+        onBackClick={() => setSelectedMovie(null)}
       />
     );
   }
@@ -57,7 +59,7 @@ export const MainView = () => {
           key={movie.id}
           movie={movie}
           onMovieClick={(newSelectedMovie) => {
-            setSelectedBook(newSelectedMovie);
+            setSelectedMovie(newSelectedMovie);
           }}
         />
       ))}
