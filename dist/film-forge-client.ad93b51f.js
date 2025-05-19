@@ -674,14 +674,16 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$ca65.prelude(module);
 
 try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _client = require("react-dom/client");
 var _mainView = require("./components/MainView/main-view");
+var _mainViewDefault = parcelHelpers.interopDefault(_mainView);
 //Import statement to indicate that you need to bundle `./index.scss`
 var _indexScss = require("./index.scss");
 //Main componet (will eventually use all the others)
 const FilmForgeApplication = ()=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _mainView.MainView), {}, void 0, false, {
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _mainViewDefault.default), {}, void 0, false, {
         fileName: "src/index.jsx",
         lineNumber: 8,
         columnNumber: 12
@@ -24956,84 +24958,108 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$def4.prelude(module);
 
 try {
+// Importing the React library, which is necessary to use JSX and React features
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MainView", ()=>MainView);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
+// Importing the MovieCard component to display individual movie previews
 var _movieCard = require("../MovieCard/movie-card");
+// Importing the MovieView component to display detailed information about a selected movie
 var _movieView = require("../MovieView/movie-view");
 var _s = $RefreshSig$();
+// Defining and exporting the MainView component
 const MainView = ()=>{
     _s();
+    // Declaring the movies state, an array of movie objects with info like title, image, director, etc.
     const [movies, setMovies] = (0, _react.useState)([
         {
             id: 1,
             title: "Inception",
-            image: "https://m.media-amazon.com/images/I/81p+xe8cbnL._AC_SY679_.jpg",
-            director: "Christopher Nolan"
+            image: "https://m.media-amazon.com/images/I/51zUbui+gbL._AC_.jpg",
+            director: "Christopher Nolan",
+            description: "A skilled thief is given a chance at redemption if he can successfully perform inception.",
+            genre: "Science Fiction",
+            directorBio: "Christopher Nolan is known for mind-bending, high-concept films like Inception, Interstellar, and Tenet."
         },
         {
             id: 2,
-            title: "The Matrix",
-            image: "https://m.media-amazon.com/images/I/51EG732BV3L.jpg",
-            director: "The Wachowskis"
+            title: "The Shawshank Redemption",
+            image: "https://m.media-amazon.com/images/I/51NiGlapXlL._AC_.jpg",
+            director: "Frank Darabont",
+            description: "Two imprisoned men bond over years and find redemption through acts of decency.",
+            genre: "Drama",
+            directorBio: "Frank Darabont is an American director and screenwriter, known for adapting Stephen King's work."
         },
         {
             id: 3,
-            title: "Interstellar",
-            image: "https://m.media-amazon.com/images/I/91kFYg4fX3L._AC_SY679_.jpg",
-            director: "Christopher Nolan"
+            title: "The Matrix",
+            image: "https://m.media-amazon.com/images/I/51EG732BV3L.jpg",
+            director: "The Wachowskis",
+            description: "A computer hacker learns the true nature of reality and his role in the war against its controllers.",
+            genre: "Action / Sci-Fi",
+            directorBio: "Lana and Lilly Wachowski are filmmakers known for pushing boundaries in sci-fi with The Matrix trilogy."
         },
         {
             id: 4,
-            title: "Pulp Fiction",
-            image: "https://m.media-amazon.com/images/I/71c05lTE03L._AC_SY679_.jpg",
-            director: "Quentin Tarantino"
+            title: "Parasite",
+            image: "https://m.media-amazon.com/images/I/71c8kbyiG0L._AC_SY679_.jpg",
+            director: "Bong Joon-ho",
+            description: "A poor family's scheme to infiltrate a wealthy household spirals out of control.",
+            genre: "Thriller / Drama",
+            directorBio: "Bong Joon-ho is an Oscar-winning South Korean director known for blending social themes with dark humor."
         },
         {
             id: 5,
-            title: "The Shawshank Redemption",
-            image: "https://m.media-amazon.com/images/I/51NiGlapXlL.jpg",
-            director: "Frank Darabont"
+            title: "The Godfather",
+            image: "https://m.media-amazon.com/images/I/51rOnIjLqzL._AC_.jpg",
+            director: "Francis Ford Coppola",
+            description: "The aging patriarch of an organized crime dynasty transfers control to his reluctant son.",
+            genre: "Crime / Drama",
+            directorBio: "Francis Ford Coppola is an iconic American director, best known for The Godfather trilogy and Apocalypse Now."
         }
     ]);
+    // Declaring state to track which movie is currently selected (starts as null)
     const [selectedMovie, setSelectedMovie] = (0, _react.useState)(null);
+    // If a movie has been selected, render the MovieView component with its details
     if (selectedMovie) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieView.MovieView), {
         movie: selectedMovie,
         onBackClick: ()=>setSelectedMovie(null)
     }, void 0, false, {
         fileName: "src/components/MainView/main-view.jsx",
-        lineNumber: 44,
+        lineNumber: 80,
         columnNumber: 7
     }, undefined);
+    // If there are no movies in the list, show a fallback message
     if (movies.length === 0) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         children: "The List is Empty!"
     }, void 0, false, {
         fileName: "src/components/MainView/main-view.jsx",
-        lineNumber: 49,
+        lineNumber: 89,
         columnNumber: 12
     }, undefined);
+    // If no movie is selected, show a list of MovieCard components (one per movie)
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         children: movies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
                 movie: movie,
                 onMovieClick: (newSelectedMovie)=>{
-                    setSelectedMovie(newSelectedMovie);
+                    setSelectedMovie(newSelectedMovie); // Updates the selected movie when a card is clicked
                 }
             }, movie.id, false, {
                 fileName: "src/components/MainView/main-view.jsx",
-                lineNumber: 55,
+                lineNumber: 96,
                 columnNumber: 9
             }, undefined))
     }, void 0, false, {
         fileName: "src/components/MainView/main-view.jsx",
-        lineNumber: 53,
+        lineNumber: 94,
         columnNumber: 5
     }, undefined);
 };
-_s(MainView, "zOusUcL8ZHDFZEIILgzWCp66Alc=");
+_s(MainView, "0itLRamUJZE3uOYMemCe5YYPub8=");
 _c = MainView;
+exports.default = MainView;
 var _c;
 $RefreshReg$(_c, "MainView");
 
@@ -25050,21 +25076,23 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$ed71.prelude(module);
 
 try {
+// Exports the MovieCard component, which receives a movie object and a click handler as props
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "MovieCard", ()=>MovieCard);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 const MovieCard = ({ movie, onMovieClick })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+    return(// When the entire card is clicked, it calls the onMovieClick function and passes the movie as an argument
+    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         onClick: ()=>{
             onMovieClick(movie);
         },
         children: movie.title
     }, void 0, false, {
         fileName: "src/components/MovieCard/movie-card.jsx",
-        lineNumber: 3,
+        lineNumber: 5,
         columnNumber: 5
-    }, undefined);
+    }, undefined));
 };
 _c = MovieCard;
 var _c;
@@ -27391,6 +27419,7 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$5092.prelude(module);
 
 try {
+// Exports the MovieView component, which takes in a movie object and a back button handler as props
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "MovieView", ()=>MovieView);
@@ -27403,12 +27432,12 @@ const MovieView = ({ movie, onBackClick })=>{
                     src: movie.image
                 }, void 0, false, {
                     fileName: "src/components/MovieView/movie-view.jsx",
-                    lineNumber: 5,
+                    lineNumber: 7,
                     columnNumber: 9
                 }, undefined)
             }, void 0, false, {
                 fileName: "src/components/MovieView/movie-view.jsx",
-                lineNumber: 4,
+                lineNumber: 6,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -27417,33 +27446,11 @@ const MovieView = ({ movie, onBackClick })=>{
                         children: "Title: "
                     }, void 0, false, {
                         fileName: "src/components/MovieView/movie-view.jsx",
-                        lineNumber: 8,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                        children: movie.title
-                    }, void 0, false, {
-                        fileName: "src/components/MovieView/movie-view.jsx",
-                        lineNumber: 9,
-                        columnNumber: 9
-                    }, undefined)
-                ]
-            }, void 0, true, {
-                fileName: "src/components/MovieView/movie-view.jsx",
-                lineNumber: 7,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                        children: "Director: "
-                    }, void 0, false, {
-                        fileName: "src/components/MovieView/movie-view.jsx",
                         lineNumber: 12,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                        children: movie.director
+                        children: movie.title
                     }, void 0, false, {
                         fileName: "src/components/MovieView/movie-view.jsx",
                         lineNumber: 13,
@@ -27455,18 +27462,106 @@ const MovieView = ({ movie, onBackClick })=>{
                 lineNumber: 11,
                 columnNumber: 7
             }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: "Description: "
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 18,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: movie.description
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 19,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/MovieView/movie-view.jsx",
+                lineNumber: 17,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: "Director: "
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 24,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: movie.director
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 25,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/MovieView/movie-view.jsx",
+                lineNumber: 23,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: "Director Bio: "
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 30,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: movie.directorBio
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 31,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/MovieView/movie-view.jsx",
+                lineNumber: 29,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: "Genre: "
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 36,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                        children: movie.genre
+                    }, void 0, false, {
+                        fileName: "src/components/MovieView/movie-view.jsx",
+                        lineNumber: 37,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/MovieView/movie-view.jsx",
+                lineNumber: 35,
+                columnNumber: 7
+            }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
                 onClick: onBackClick,
                 children: "Back"
             }, void 0, false, {
                 fileName: "src/components/MovieView/movie-view.jsx",
-                lineNumber: 15,
+                lineNumber: 41,
                 columnNumber: 7
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/MovieView/movie-view.jsx",
-        lineNumber: 3,
+        lineNumber: 4,
         columnNumber: 5
     }, undefined);
 };
