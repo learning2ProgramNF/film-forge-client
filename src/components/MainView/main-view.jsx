@@ -34,6 +34,7 @@ const MainView = () => {
     fetch("https://film-forge-11a9389fe47d.herokuapp.com/movies")
       .then((response) => response.json())
       .then((data) => {
+        console.log("Fetched movies", data);
         setMovies(data);
       })
       .catch((error) => {
