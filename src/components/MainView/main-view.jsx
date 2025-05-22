@@ -20,16 +20,6 @@ const MainView = () => {
   // Declaring state to track which movie is currently selected (starts as null)
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  // If a movie has been selected, render the MovieView component with its details
-  if (selectedMovie) {
-    return (
-      <MovieView
-        movie={selectedMovie}
-        onBackClick={() => setSelectedMovie(null)}
-      />
-    );
-  }
-
   useEffect(() => {
     fetch("https://film-forge-11a9389fe47d.herokuapp.com/movies")
       .then((response) => response.json())
@@ -41,6 +31,20 @@ const MainView = () => {
         console.error("Error fetching movies", error);
       });
   }, []);
+
+  // If a movie has been selected, render the MovieView component with its details
+  if (selectedMovie) {
+    return (
+      <MovieView
+        movie={selectedMovie}
+        movies={movies}
+        onMovieClick={(newSelectedMovie) => {
+          setSelectedMovie(newSelectedMovie);
+        }}
+        onBackClick={() => setSelectedMovie(null)}
+      />
+    );
+  }
 
   // If there are no movies in the list, show a fallback message
   if (movies.length === 0) {
