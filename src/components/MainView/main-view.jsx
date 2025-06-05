@@ -19,12 +19,15 @@ import { SignUpView } from "../SignUpView/signup-view"
 // Importing Prop-Types
 import PropTypes from "prop-types";
 
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
 // Defining and exporting the MainView component
 export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
-  const [user, setUser] = useState(storedUser? storedUser : null);
-  const [token, setToken] = useState(storedToken? storedToken : null);
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
   // Declaring the movies state, an array of movie objects with info like title, image, director, etc.
   const [movies, setMovies] = useState([]);
   // Declaring state to track which movie is currently selected (starts as null)
@@ -33,11 +36,12 @@ export const MainView = () => {
   if (!user) {
     return (
       <>
-      <LoginView
-        onLoggedIn={(user, token) => {
-          setUser(user);
-          setToken(token);
-        }} />
+        <LoginView
+          onLoggedIn={(user, token) => {
+            setUser(user);
+            setToken(token);
+          }}
+        />
         or
         <SignUpView />
       </>
@@ -50,51 +54,58 @@ export const MainView = () => {
     }
 
     fetch("https://film-forge-11a9389fe47d.herokuapp.com/movies", {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
-      .then((movies) => {
-        console.log("Fetched movies", movies);
-        setMovies(movies);
-      })
-      .catch((error) => {
-        console.error("Error fetching movies", error);
+      .then((data) => {
+        const moviesFromApi = data.docs.map((doc) => {
+          return {
+            id: doc.key,
+            title: doc.title,
+            director: doc.director_name?.[0],
+          };
+        });
+        setMovies(moviesFromApi);
       });
   }, [token]);
 
-  // If a movie has been selected, render the MovieView component with its details
-  if (selectedMovie) {
-    return (
-      <MovieView
-        movie={selectedMovie}
-        movies={movies}
-        onMovieClick={(newSelectedMovie) => {
-          setSelectedMovie(newSelectedMovie);
-        }}
-        onBackClick={() => setSelectedMovie(null)}
-      />
-    );
-  }
-
-  // If there are no movies in the list, show a fallback message
-  if (movies.length === 0) {
-    return <div>The List is Empty!</div>;
-  }
 
   // If no movie is selected, show a list of MovieCard components (one per movie)
   return (
-    <div>
-      <button onClick={() => { setUser(null); setToken(null); }}>Logout</button>
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie._id} // Unique key to help React track each item
-          movie={movie} // Passing movie data as a prop
-          onMovieClick={(newSelectedMovie) => {
-            setSelectedMovie(newSelectedMovie); // Updates the selected movie when a card is clicked
-          }}
-        />
-      ))}
-    </div>
+    <Row className='justify-content-md-center'>
+      {!user ? (
+        <>
+          <Col md={5}>
+            <LoginView onLoggedIn={(user) => setUser(user)} />
+            or
+            <SignUpView />
+          </Col>
+        </>
+      ) : selectedMovie ? (
+        <Col md={8} style={{ border: "1px solid black" }}>
+          <MovieView
+            movie={selectedMovie}
+            onBackClick={() => setSelectedMovie(null)}
+          />
+        </Col>
+      ) : movies.length === 0 ? (
+        <div>The List is Empty!</div>
+      ) : (
+        <>
+          {movies.map((movie) => (
+            <Col className='mb-5' key={movie.id} md={3}>
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                onMovieClick={(newSelectedMovie) => {
+                  setSelectedMovie(newSelectedMovie);
+                }}
+              />
+            </Col>
+          ))}
+        </>
+      )}
+    </Row>
   );
 };
 

@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { MovieCard } from "../MovieCard/movie-card";
+import "./movie-view.scss";
 
 export const MovieView = ({ movie, onBackClick, movies, onMovieClick }) => {
   //Filter similar movies by genre (excluding the current one)
