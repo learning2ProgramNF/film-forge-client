@@ -3,6 +3,11 @@ import { MovieCard } from "../MovieCard/movie-card";
 import "./movie-view.scss";
 
 export const MovieView = ({ movie, onBackClick, movies, onMovieClick }) => {
+  
+  if (!movie || !movies) {
+    return <div>Loading movie data...</div>;
+  }
+  
   //Filter similar movies by genre (excluding the current one)
   const similarMovies = movies.filter(
     (m) => m.genre.name === movie.genre.name && m._id !== movie._id
@@ -55,7 +60,7 @@ MovieView.propTypes = {
   movie: PropTypes.shape({
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
-    imagePath: PropTypes.string.isRequired,
+    imagePath: PropTypes.string,
     genre: PropTypes.shape({
       name: PropTypes.string,
       description: PropTypes.string,
