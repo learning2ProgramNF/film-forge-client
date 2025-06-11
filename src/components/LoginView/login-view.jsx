@@ -11,8 +11,8 @@ export const LoginView = ({ onLoggedIn }) => {
     event.preventDefault();
 
     const data = {
-      Username: username,
-      Password: password,
+      username: username,
+      password: password,
     };
 
     fetch("https://film-forge-11a9389fe47d.herokuapp.com/login", {
@@ -22,20 +22,30 @@ export const LoginView = ({ onLoggedIn }) => {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Login response: ", data);
-        if (data.user && data.token) {
-          localStorage.setItem("user", JSON.stringify(data.user));
-          localStorage.setItem("token", data.token);
-          onLoggedIn(data.user, data.token);
+      .then(async (response) => {
+        const resData = await response.json();
+
+        if (!response.ok) {
+          //If the reponse is not ok, throw from the backend or a fallback messsage
+          throw new Error(
+            resData.message || "Login failed please check your credentials."
+          );
+        }
+
+        //Success case
+        if (resData.user && resData.token) {
+          localStorage.setItem("user", JSON.stringify(resData.user));
+          localStorage.setItem("token", resData.token);
+          onLoggedIn(resData.user, resData.token);
         } else {
-          alert("No such user");
+          throw new Error("Unexpected response structure.");
         }
       })
       .catch((e) => {
-        alert("Something went wrong");
-      });
+        alert(`Login error: ${e.message}`);
+        console.error("Detailed login error", e);
+      });  
+      
   };
 
   return (
