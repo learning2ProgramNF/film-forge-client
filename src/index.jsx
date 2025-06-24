@@ -1,15 +1,18 @@
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import MainView from "./components/MainView/main-view";
-//Import statement to indicate that you need to bundle `./index.scss`
+import "bootstrap/dist/css/bootstrap.min.css"; 
 import "./index.scss";
 import { Container } from "react-bootstrap";
 
 //Main componet (will eventually use all the others)
 const FilmForgeApplication = () => {
   return (
-    <Container>
-      <MainView />;
-    </Container>
+    <BrowserRouter>
+      <Container>
+        <MainView />
+      </Container>
+    </BrowserRouter>
   );
 };
 
