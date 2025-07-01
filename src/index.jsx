@@ -1,18 +1,23 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./store/store.js";
+
 import MainView from "./components/MainView/main-view";
-import "bootstrap/dist/css/bootstrap.min.css"; 
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.scss";
 import { Container } from "react-bootstrap";
 
 //Main componet (will eventually use all the others)
 const FilmForgeApplication = () => {
   return (
-    <BrowserRouter>
-      <Container>
-        <MainView />
-      </Container>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Container>
+          <MainView />
+        </Container>
+      </BrowserRouter>
+    </Provider>
   );
 };
 

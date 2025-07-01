@@ -1,7 +1,17 @@
 import React from "react";
-import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setUser,
+  setToken,
+  logoutUser,
+  updateUser,
+  addFavorite,
+  removeFavorite,
+} from "../../actions/userActions.js";
+import { setMovies } from "../../actions/movieActions";
 
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MovieCard } from "../MovieCard/movie-card";
 import { MovieView } from "../MovieView/movie-view";
 import { LoginView } from "../LoginView/login-view";
@@ -15,16 +25,24 @@ import Container from "react-bootstrap/Container";
 
 // Defining and exporting the MainView component
 export const MainView = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const patchedUser = storedUser
-    ? { ...storedUser, favoriteMovies: storedUser.favoriteMovies || [] }
-    : null;
-  const [user, setUser] = useState(patchedUser);
+  const dispatch = useDispatch();
 
-  const storedToken = localStorage.getItem("token");
-  const [token, setToken] = useState(storedToken ? storedToken : null);
-  const [movies, setMovies] = useState([]);
+  const user = useSelector((state) => state.user.user);
+  const token = useSelector((state) => state.user.token);
+  const movies = useSelector((state) => state.movies);
 
+  //Restore from local storage
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedToken = localStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      dispatch(setUser(storedUser));
+      dispatch(setToken(storedToken));
+    }
+  }, [dispatch]);
+
+  //Fetch movies when token exists
   useEffect(() => {
     if (!token) return;
 
@@ -38,7 +56,7 @@ export const MainView = () => {
       .then((data) => {
         const moviesFromApi = data.map((doc) => ({
           _id: doc._id,
-          title: doc.title || "No Title",
+          title: doc.title || "No title",
           description: doc.description || "No Description",
           imagePath: doc.imagePath || "https://via.placeholder.com/150",
           genre: {
@@ -50,24 +68,19 @@ export const MainView = () => {
             bio: doc.director?.bio || "",
           },
         }));
-        setMovies(moviesFromApi);
+        dispatch(setMovies(moviesFromApi));
       })
-      .catch((err) => {
-        console.error("Fetch error: ", err);
-      });
-  }, [token]);
+      .catch((err) => console.error("Fetch error: ", err));
+  }, [token, dispatch]);
 
-  //Logout Handler
   const handleLogout = () => {
-    setUser(null);
-    setToken(null);
+    dispatch(logoutUser());
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    setMovies([]);
+    dispatch(setMovies([]));
   };
 
-  //Update handler for profile
-  const handleUpdateUser = async (updatedData) => {
+  const handleUpdateUser = async (updateData) => {
     const response = await fetch(
       `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}`,
       {
@@ -76,29 +89,27 @@ export const MainView = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify(updateData),
       }
     );
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("Update Failed:", errText);
+      console.error("Update Failed: ", errText);
       throw new Error("Failed to update user");
     }
 
     const resData = await response.json();
-
-    if (resData && resData.token) {
-      setUser(resData.user);
-      setToken(resData.token);
+    if (resData?.user && resData?.token) {
+      dispatch(setUser(resData.user));
+      dispatch(setToken(resData.token));
       localStorage.setItem("user", JSON.stringify(resData.user));
       localStorage.setItem("token", resData.token);
     } else {
-      throw new Error("Unexpected response structure from upadte.");
+      throw new Error("Unexpected response structure from update");
     }
   };
 
-  //Update handler for profile
   const handleDeleteUser = () => {
     fetch(
       `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}`,
@@ -114,7 +125,7 @@ export const MainView = () => {
       .catch((err) => console.error(err));
   };
 
-  const addFavorite = (movieId) => {
+  const handleAddFavorite = (movieId) => {
     fetch(
       `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}/movies/${movieId}`,
       {
@@ -122,134 +133,129 @@ export const MainView = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     )
+     .then(() => {
+      dispatch(addFavorite(movieId));
+      const updatedUser = {
+        ...user,
+        favoriteMovies: [...user.favoriteMovies, movieId],
+      };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+     })
+     .catch((err) => console.error(err));
+  };
+
+  const handleRemoveFavorite = (movieId) => {
+    fetch(
+      `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}/movies/${movieId}`,
+    {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }
+    )
       .then(() => {
+        dispatch(removeFavorite(movieId));
         const updatedUser = {
           ...user,
-          favoriteMovies: [...user.favoriteMovies, movieId],
+          favoriteMovies: user.favoriteMovies.filter((id) => id !== movieId),
         };
-        setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
       })
       .catch((err) => console.error(err));
   };
 
-  const removeFavorite = (movieId) => {
-    fetch(
-      `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}/movies/${movieId}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
-      .then(() => {
-        const updatedUser = {
-          ...user,
-          favoriteMovies: user.favoriteMovies.filter(
-            (id) => id.toString() !== movieId
-          ),
-        };
-        setUser(updatedUser);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-      })
-      .catch((err) => console.error(err));
-  };
-  // If no movie is selected, show a list of MovieCard components (one per movie)
   return (
     <>
       <NavigationBar user={user} onLoggedOut={handleLogout} />
       <Container>
-        <Row className='justify-content-md-center'>
+        <Row className="justify-content-md-center">
           <Routes>
-            <Route
-              path='/signup'
-              element={user ? <Navigate to='/' /> : <SignUpView />}
+            <Route 
+              path='signup'
+              element={user ? <Navigate to="/" /> : <SignUpView />}
             />
             <Route
-              path='/login'
+              path="/login"
               element={
                 user ? (
-                  <Navigate to='/' />
+                  <Navigate to="/" />
                 ) : (
                   <LoginView
                     onLoggedIn={(user, token) => {
-                      const completeUser = {
-                        _id: user._id,
-                        username: user.username,
-                        email: user.email,
-                        birthday: user.birthday,
-                        favoriteMovies: user.favoriteMovies || [],
-                      };
-
-                      setUser(completeUser);
-                      setToken(token);
-                      localStorage.setItem(
-                        "user",
-                        JSON.stringify(completeUser)
-                      );
-                      localStorage.setItem("token", token);
+                     const completeUser = {
+                      _id: user._id,
+                      username: user.username,
+                      email: user.email,
+                      birthday: user.birthday,
+                      favoriteMovies: user.favoriteMovies || [],
+                     };
+                     dispatch(setUser(completeUser));
+                     dispatch(setToken(token));
+                     localStorage.setItem(
+                      "user",
+                      JSON.stringify(completeUser)
+                     );
+                     localStorage.setItem("token", token);
                     }}
                   />
                 )
               }
             />
             <Route
-              path='/movies/:movieId'
-              element={
-                !user ? (
-                  <Navigate to='/login' />
-                ) : (
-                  <Col md={8}>
-                    <MovieView
-                      movies={movies}
-                      user={user}
-                      onAddFav={addFavorite}
-                      onRemoveFav={removeFavorite}
-                    />
-                  </Col>
-                )
-              }
+             path="movies/:movieId"
+             element={
+              !user ? (
+                <Navigate to="/login"/>
+              ): (
+                <Col md={8}>
+                  <MovieView
+                    movies={movies}
+                    user={user}
+                    onAddFav={handleAddFavorite}
+                    onRemoveFav={handleRemoveFavorite}
+                  />
+                </Col>
+              )
+             } 
             />
             <Route
-              path='/profile'
-              element={
-                !user ? (
-                  <Navigate to='/login' />
-                ) : (
-                  <Col md={8}>
-                    <ProfileView
-                      user={user}
-                      movies={movies}
-                      onLogout={handleLogout}
-                      onLoggedOut={handleLogout}
-                      onUpdateUser={handleUpdateUser}
-                      onDeleteUser={handleDeleteUser}
-                      onAddFav={addFavorite}
-                      onRemoveFav={removeFavorite}
-                    />
-                  </Col>
-                )
-              }
+             path="/profile"
+            element={
+              !user ? (
+                <Navigate to="/login"/>
+              ) : (
+                <Col md={8}>
+                  <ProfileView
+                    user={user}
+                    movies={movies}
+                    onLogout={handleLogout}
+                    onLoggedOut={handleLogout}
+                    onUpdateUser={handleUpdateUser}
+                    onDeleteUser={handleDeleteUser}
+                    onAddFav={handleAddFavorite}
+                    onRemoveFav={handleRemoveFavorite}
+                  />
+                </Col>
+              )
+            }
             />
             <Route
-              path='/'
+              path="/"
               element={
                 !user ? (
-                  <Navigate to='/login' />
-                ) : movies.length === 0 ? (
-                  <div>The List is Empty!</div>
+                  <Navigate to="/login"/>
                 ) : (
                   <>
                     {movies.map((movie) => (
-                      <Col className='mb-5' key={movie._id} md={3}>
+                      <Col className="mb-5" key={movie._id} md={3}>
                         <MovieCard
                           movie={movie}
                           isFavorite={(user.favoriteMovies || []).includes(
                             movie._id
                           )}
-                          onFavoriteToggle={() =>
-                            (user.favoriteMovies || []).includes(movie._id)
-                              ? removeFavorite(movie._id)
-                              : addFavorite(movie._id)
+                          onFavoriteToggle={() => 
+                          (user.favoriteMovies || []).includes(movie._id)
+                            ? handleRemoveFavorite(movie._id)
+                            : handleAddFavorite(movie._id)
                           }
                         />
                       </Col>
@@ -262,7 +268,7 @@ export const MainView = () => {
         </Row>
       </Container>
     </>
-  );
+  )
 };
 
 export default MainView;
