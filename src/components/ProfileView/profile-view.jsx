@@ -1,25 +1,30 @@
-import PropTypes from "prop-types";
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  updateUser,
+  removeFavorite,
+  logoutUser,
+} from "../../actions/userActions";
+import { setUser, setToken } from "../../actions/userActions";
+
 import { Card, Form, Button, Row, Col, Container } from "react-bootstrap";
 import { MovieCard } from "../MovieCard/movie-card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./profile-view.scss";
 
-export const ProfileView = ({
-  user,
-  movies,
-  onLoggedOut,
-  onUpdateUser,
-  onDeleteUser,
-  onAddFav,
-  onRemoveFav,
-}) => {
+export const ProfileView = () => {
+  const user = useSelector((state) => state.user.user);
+  const token = useSelector((state) => state.user.token);
+  const movies = useSelector((state) => state.movies);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: user.username,
     name: user.name || "",
     password: "",
     email: user.email,
-    birthday: user.birthday?.split("T")[0] || " ",
+    birthday: user.birthday?.split("T")[0] || "",
   });
 
   const handleChange = ({ target }) => {
@@ -28,18 +33,78 @@ export const ProfileView = ({
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await onUpdateUser(formData);
+      const response = await fetch(
+        `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("Update error:", err);
+        throw new Error("Update failed");
+      }
+
+      const resData = await response.json();
+      dispatch(setUser(resData.user));
+      dispatch(setToken(resData.token));
+      localStorage.setItem("user", JSON.stringify(resData.user));
+      localStorage.setItem("token", resData.token);
+      alert("Profile Updated");
     } catch (error) {
       alert("Failed to update profile: " + error.message);
     }
+  };
+
+  const handleDeleteUser = () => {
+    fetch(
+      `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then(() => {
+        dispatch(logoutUser());
+        localStorage.clear();
+        navigate("/login");
+        alert("Account deleted. ");
+      })
+      .catch((err) => console.error("Delete failed: ", err));
+  };
+
+  const handleRemoveFavorite = (movieId) => {
+    fetch(
+      `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}/movies/${movieId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then(() => {
+        dispatch(removeFavorite(movieId));
+        const updatedUser = {
+          ...user,
+          favoriteMovies: user.favoriteMovies.filter((id) => id !== movieId),
+        };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      })
+      .catch((err) => console.error(err));
   };
 
   const favMovies = movies.filter((m) => user.favoriteMovies.includes(m._id));
 
   return (
     <Container className='profile-view my-5'>
-      {/*Profile Info */}
+      {/* Profile Info */}
       <Card md={6}>
         <Card.Body>
           <Card.Title className='mb-4'>Your Profile</Card.Title>
@@ -84,14 +149,12 @@ export const ProfileView = ({
                   />
                 </Form.Group>
               </Col>
-            </Row>
 
-            <Row>
               <Col md={6}>
                 <Form.Group controlId='formPassword' className='mb-3'>
                   <Form.Label>Password</Form.Label>
                   <Form.Control
-                    type='password'
+                    type='text'
                     name='password'
                     value={formData.password}
                     onChange={handleChange}
@@ -117,7 +180,7 @@ export const ProfileView = ({
               <Button type='submit' variant='primary'>
                 Update Profile
               </Button>
-              <Button variant='danger' onClick={onDeleteUser}>
+              <Button variant='danger' onClick={handleDeleteUser}>
                 Delete Account
               </Button>
               <Link to='/'>
@@ -132,7 +195,7 @@ export const ProfileView = ({
         <Card.Body>
           <Card.Title className='mb-4'>Favorite Movies</Card.Title>
           {favMovies.length === 0 ? (
-            <p>You haven't added any favorite movies yet.</p>
+            <p>You haven't added any movies to favorites yet.</p>
           ) : (
             <Row className='g-4'>
               {favMovies.map((movie) => (
@@ -140,7 +203,7 @@ export const ProfileView = ({
                   <MovieCard
                     movie={movie}
                     isFavorite={true}
-                    onFavoriteToggle={() => onRemoveFav(movie._id)}
+                    onFavoriteToggle={() => handleRemoveFavorite(movie._id)}
                   />
                 </Col>
               ))}
@@ -150,20 +213,4 @@ export const ProfileView = ({
       </Card>
     </Container>
   );
-};
-
-ProfileView.propTypes = {
-  user: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    email: PropTypes.string.isRequired,
-    birthday: PropTypes.string,
-    favoriteMovies: PropTypes.array.isRequired,
-  }).isRequired,
-  movies: PropTypes.array.isRequired,
-  onLoggedOut: PropTypes.func.isRequired,
-  onUpdateUser: PropTypes.func.isRequired,
-  onDeleteUser: PropTypes.func.isRequired,
-  onAddFav: PropTypes.func.isRequired,
-  onRemoveFav: PropTypes.func.isRequired,
 };
