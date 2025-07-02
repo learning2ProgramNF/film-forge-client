@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setUser,
@@ -22,6 +22,7 @@ import { NavigationBar } from "../NavigationBar/navigation-bar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
 
 // Defining and exporting the MainView component
 export const MainView = () => {
@@ -30,6 +31,8 @@ export const MainView = () => {
   const user = useSelector((state) => state.user.user);
   const token = useSelector((state) => state.user.token);
   const movies = useSelector((state) => state.movies);
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   //Restore from local storage
   useEffect(() => {
@@ -133,24 +136,24 @@ export const MainView = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     )
-     .then(() => {
-      dispatch(addFavorite(movieId));
-      const updatedUser = {
-        ...user,
-        favoriteMovies: [...user.favoriteMovies, movieId],
-      };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-     })
-     .catch((err) => console.error(err));
+      .then(() => {
+        dispatch(addFavorite(movieId));
+        const updatedUser = {
+          ...user,
+          favoriteMovies: [...user.favoriteMovies, movieId],
+        };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleRemoveFavorite = (movieId) => {
     fetch(
       `https://film-forge-11a9389fe47d.herokuapp.com/users/${user.username}/movies/${movieId}`,
-    {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    }
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
     )
       .then(() => {
         dispatch(removeFavorite(movieId));
@@ -167,99 +170,112 @@ export const MainView = () => {
     <>
       <NavigationBar user={user} onLoggedOut={handleLogout} />
       <Container>
-        <Row className="justify-content-md-center">
+        <Row className='justify-content-md-center'>
           <Routes>
-            <Route 
+            <Route
               path='signup'
-              element={user ? <Navigate to="/" /> : <SignUpView />}
+              element={user ? <Navigate to='/' /> : <SignUpView />}
             />
             <Route
-              path="/login"
+              path='/login'
               element={
                 user ? (
-                  <Navigate to="/" />
+                  <Navigate to='/' />
                 ) : (
                   <LoginView
                     onLoggedIn={(user, token) => {
-                     const completeUser = {
-                      _id: user._id,
-                      username: user.username,
-                      email: user.email,
-                      birthday: user.birthday,
-                      favoriteMovies: user.favoriteMovies || [],
-                     };
-                     dispatch(setUser(completeUser));
-                     dispatch(setToken(token));
-                     localStorage.setItem(
-                      "user",
-                      JSON.stringify(completeUser)
-                     );
-                     localStorage.setItem("token", token);
+                      const completeUser = {
+                        _id: user._id,
+                        username: user.username,
+                        email: user.email,
+                        birthday: user.birthday,
+                        favoriteMovies: user.favoriteMovies || [],
+                      };
+                      dispatch(setUser(completeUser));
+                      dispatch(setToken(token));
+                      localStorage.setItem(
+                        "user",
+                        JSON.stringify(completeUser)
+                      );
+                      localStorage.setItem("token", token);
                     }}
                   />
                 )
               }
             />
             <Route
-             path="movies/:movieId"
-             element={
-              !user ? (
-                <Navigate to="/login"/>
-              ): (
-                <Col md={8}>
-                  <MovieView
-                    movies={movies}
-                    user={user}
-                    onAddFav={handleAddFavorite}
-                    onRemoveFav={handleRemoveFavorite}
-                  />
-                </Col>
-              )
-             } 
-            />
-            <Route
-             path="/profile"
-            element={
-              !user ? (
-                <Navigate to="/login"/>
-              ) : (
-                <Col md={8}>
-                  <ProfileView
-                    user={user}
-                    movies={movies}
-                    onLogout={handleLogout}
-                    onLoggedOut={handleLogout}
-                    onUpdateUser={handleUpdateUser}
-                    onDeleteUser={handleDeleteUser}
-                    onAddFav={handleAddFavorite}
-                    onRemoveFav={handleRemoveFavorite}
-                  />
-                </Col>
-              )
-            }
-            />
-            <Route
-              path="/"
+              path='movies/:movieId'
               element={
                 !user ? (
-                  <Navigate to="/login"/>
+                  <Navigate to='/login' />
+                ) : (
+                  <Col md={8}>
+                    <MovieView
+                      movies={movies}
+                      user={user}
+                      onAddFav={handleAddFavorite}
+                      onRemoveFav={handleRemoveFavorite}
+                    />
+                  </Col>
+                )
+              }
+            />
+            <Route
+              path='/profile'
+              element={
+                !user ? (
+                  <Navigate to='/login' />
+                ) : (
+                  <Col md={8}>
+                    <ProfileView
+                      user={user}
+                      movies={movies}
+                      onLogout={handleLogout}
+                      onLoggedOut={handleLogout}
+                      onUpdateUser={handleUpdateUser}
+                      onDeleteUser={handleDeleteUser}
+                      onAddFav={handleAddFavorite}
+                      onRemoveFav={handleRemoveFavorite}
+                    />
+                  </Col>
+                )
+              }
+            />
+            <Route
+              path='/'
+              element={
+                !user ? (
+                  <Navigate to='/login' />
                 ) : (
                   <>
-                    {movies.map((movie) => (
-                      <Col className="mb-5" key={movie._id} md={3}>
-                        <MovieCard
-                          movie={movie}
-                          isFavorite={(user.favoriteMovies || []).includes(
-                            movie._id
-                          )}
-                          onFavoriteToggle={() => 
-                          (user.favoriteMovies || []).includes(movie._id)
-                            ? handleRemoveFavorite(movie._id)
-                            : handleAddFavorite(movie._id)
-                          }
-                        />
-                      </Col>
-                    ))}
+                    <Form.Control
+                      type='text'
+                      placeholder='Search movies...'
+                      className='mb-4'
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {movies
+                      .filter((movie) =>
+                        movie.title
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
+                      )
+                      .map((movie) => (
+                        <Col className='mb-5' key={movie._id} md={3}>
+                          <MovieCard
+                            movie={movie}
+                            isFavorite={(user.favoriteMovies || []).includes(
+                              movie._id
+                            )}
+                            onFavoriteToggle={() =>
+                              (user.favoriteMovies || []).includes(movie._id)
+                                ? handleRemoveFavorite(movie._id)
+                                : handleAddFavorite(movie._id)
+                            }
+                          />
+                        </Col>
+                      ))}
                   </>
                 )
               }
@@ -268,7 +284,7 @@ export const MainView = () => {
         </Row>
       </Container>
     </>
-  )
+  );
 };
 
 export default MainView;
