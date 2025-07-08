@@ -5320,9 +5320,8 @@ ${frame.code}`;
                 stringValue = node.getAttribute(attributeName);
               }
               if (shouldRemoveAttribute(name, expected, propertyInfo, false))
-                return stringValue === null
-                  ? expected
-                  : stringValue; // eslint-disable-next-line react-internal/safe-string-coercion
+                return stringValue === null ? expected : stringValue;
+              // eslint-disable-next-line react-internal/safe-string-coercion
               else if (stringValue === "" + expected) return expected;
               else return stringValue;
             }
@@ -28837,9 +28836,8 @@ ${frame.code}`;
               // hook updates, which are handled differently and don't reach this
               // function), but there are some internal React features that use this as
               // an implementation detail, like selective hydration.
-              warnAboutRenderPhaseUpdatesInDEV(
-                fiber
-              ); // Track lanes that were updated during the render phase
+              warnAboutRenderPhaseUpdatesInDEV(fiber);
+            // Track lanes that were updated during the render phase
             else {
               if (isDevToolsPresent) addFiberToLanesMap(root, fiber, lane);
               warnIfUpdatesNotWrappedWithActDEV(fiber);
@@ -70022,14 +70020,13 @@ object-assign
           $cdea3ae92bef6910$exports
         ).setColors($b67e2a05a9c13039$var$colors);
         // $FlowFixMe
-        for (let tag in /*@__PURE__*/ $parcel$interopDefault(
+        /*@__PURE__*/ for (let tag in /*@__PURE__*/ $parcel$interopDefault(
           $cdea3ae92bef6910$exports
         ).tags.open)
-          /*@__PURE__*/ $parcel$interopDefault(
-            $cdea3ae92bef6910$exports
-          ).tags.open[tag] = /*@__PURE__*/ $parcel$interopDefault(
-            $cdea3ae92bef6910$exports
-          ).tags.open[tag].replace(/#light-dark/g, "light-dark");
+          $parcel$interopDefault($cdea3ae92bef6910$exports).tags.open[tag] =
+            /*@__PURE__*/ $parcel$interopDefault(
+              $cdea3ae92bef6910$exports
+            ).tags.open[tag].replace(/#light-dark/g, "light-dark");
         function $b67e2a05a9c13039$var$generateAnsiHTML(txt) {
           return /*@__PURE__*/ $parcel$interopDefault(
             $cdea3ae92bef6910$exports
